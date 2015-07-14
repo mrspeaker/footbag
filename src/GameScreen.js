@@ -5,13 +5,15 @@ function GameScreen (canvas, controls, gameOver) {
 
   var surface = new Surface(60, 40);
   var rover = new Rover(controls);
-  rover.pos = surface.getRandomPos();
+  rover.pos = {x: 30 * 32, y: 20 * 32};
 
   var bag = new Bag();
   bag.pos = {
     x: rover.pos.x,
     y: rover.pos.y
   };
+  bag.groundLevel = 20 * 34;
+  this.kicks = 0;
 
   var camera = new Camera({
     focusObject: rover,
@@ -31,10 +33,10 @@ function GameScreen (canvas, controls, gameOver) {
   this.add(new Rect('rgba(0, 0, 0, 0.5)', canvas.width, 20));
   var font = {font: '12pt monospace', fill: '#fff'};
 
-  var msgScience = new Text('SCIENCE: -', font);
-  msgScience.pos = {x: 5, y: 15};
-  this.add(msgScience);
-  this.gui.science = msgScience;
+  var msgKicks = new Text('KICKS: -', font);
+  msgKicks.pos = {x: 5, y: 15};
+  this.add(msgKicks);
+  this.gui.kicks = msgKicks;
 
   // Keep references to things we need in "update"
   this.surface = surface;
@@ -63,14 +65,30 @@ GameScreen.prototype.update = function (dt, t) {
 		ax <= b.pos.x + b.w &&
 		ay + ah >= b.pos.y &&
 		ay <= b.pos.y + b.h) {
-      this.bag.acc.y = -3;
-	}
 
+      var midb = b.pos.x + b.w / 2;
+      var midr = ax + aw / 2;
+
+      var diff = midr - midb;
+      this.bag.kick(diff * 0.5);
+      b.onGround = false;
+      this.kicks++;
+	} else if (b.onGround) {
+    this.kicks = 0;
+  }
+
+  // 0...4
+  // [   ]
+  // [  [] ]
+  //    [  ]
+  //    3..6
 
   // Confine player to the play area
   rover.pos.x = Math.max(rover.pos.x, 40);
   rover.pos.x = Math.min(rover.pos.x, surface.w - 40);
   rover.pos.y = Math.max(rover.pos.y, 40);
   rover.pos.y = Math.min(rover.pos.y, surface.h - 40);
+
+  this.gui.kicks.text = this.kicks.toString();
 
 };

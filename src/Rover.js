@@ -25,10 +25,10 @@ Rover.prototype.update = function (dt, t) {
   var controlsX = this.controls.x();
   var controlsY = this.controls.y();
 
-  var speed = 0.1;
+  var speed = 0.2;
   var xo = controlsX * dt * speed;
   var yo = controlsY * dt * speed;
 
   this.pos.x += xo;
-  this.pos.y += yo;
+  //this.pos.y += yo;
 };
